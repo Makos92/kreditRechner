@@ -39,7 +39,10 @@ public class Controller {
 
     @FXML
     void buttonBerechnenClicked(ActionEvent event) {
-        berechnen();
+        inputTest();
+        resultMonthlyPayment();
+        resultPayment();
+        buttonBerechnen.setDisable(true);
     }
 
     @FXML
@@ -52,11 +55,12 @@ public class Controller {
         textFieldTerm.setText("");
 
     }
+    double principal = 0;
+    double interestRate = 0;
+    int howManyYears = 0;
 
-    public void berechnen(){
-        double principal = 0;
-        double interestRate = 0;
-        double numbersOfPayments = 0;
+    private void  inputTest(){
+
         try {
             principal = Double.parseDouble(textFieldPrincipal.getText());
         }
@@ -69,7 +73,7 @@ public class Controller {
             return;
         }
         try {
-            interestRate = Double.parseDouble(textFieldInterestRate.getText()) / NUMBER_TO_PERCENT;
+            interestRate = Double.parseDouble(textFieldInterestRate.getText()) ;
         }
         catch (NumberFormatException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -80,7 +84,7 @@ public class Controller {
             return;
         }
         try {
-            numbersOfPayments = Double.parseDouble(textFieldTerm.getText()) * MONTH_IN_THE_YEAR;
+            howManyYears = Integer.parseInt(textFieldTerm.getText()) ;
         }
         catch (NumberFormatException e){
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -90,17 +94,50 @@ public class Controller {
             textFieldTerm.setText("");
             return;
         }
+    }
 
-        double monthlyInterestRate = interestRate / MONTH_IN_THE_YEAR;
+    private void resultPayment() {
+        textFieldTotalPayment.setText(String.valueOf(NumberFormat.getCurrencyInstance().format
+                (totalPayback
+                        (monthlyPayment(principal , monthlyInterestRate(percentInterestRate(interestRate , NUMBER_TO_PERCENT) , MONTH_IN_THE_YEAR) ,
+                                numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)),numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)))));
+    }
+
+    private void resultMonthlyPayment(){
+        textFieldMonthlyPayment.setText(String.valueOf(NumberFormat.getCurrencyInstance().format(monthlyPayment(principal ,
+                monthlyInterestRate(percentInterestRate(interestRate , NUMBER_TO_PERCENT) , MONTH_IN_THE_YEAR) ,
+                numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)))));
+    }
+
+    //number to percent
+    private double percentInterestRate (double interestRate , int numberToPercent){
+        double percentInterestRate = interestRate / numberToPercent;
+        return percentInterestRate;
+
+    }
+    //monats zins
+    private double monthlyInterestRate (double percentInterestRate , int monthInTheYear){
+        double monthlyInterestRate = percentInterestRate / monthInTheYear;
+        return monthlyInterestRate;
+    }
+
+    // rate zahl
+    private int numberOfPayments (int howManyYear, int monthInTheYear){
+        int numberOfPayments = howManyYear * monthInTheYear;
+        return numberOfPayments;
+    }
+    //gesamt kredit
+    private double totalPayback (double monthlyPayment , int numberOfPayments){
+        double totalPayback = monthlyPayment * numberOfPayments;
+        return totalPayback;
+    }
+
+    //monats rate
+    private double monthlyPayment (double principal , double monthlyInterestRate , int numbersOfPayments){
         double monthlyPayment = principal *
                 (monthlyInterestRate * (Math.pow(1 + monthlyInterestRate , numbersOfPayments))) /
                 ((Math.pow(1 + monthlyInterestRate , numbersOfPayments)) -1);
-        double totalPayback = monthlyPayment * numbersOfPayments;
-
-        textFieldTotalPayment.setText(String.valueOf(NumberFormat.getCurrencyInstance().format(totalPayback)));
-        textFieldMonthlyPayment.setText(String.valueOf(NumberFormat.getCurrencyInstance().format(monthlyPayment)));
-
-        buttonBerechnen.setDisable(true);
+        return monthlyPayment;
     }
 
 
