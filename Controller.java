@@ -12,6 +12,9 @@ import java.text.NumberFormat;
 public class Controller {
     private static final int MONTH_IN_THE_YEAR = 12;
     private static final int NUMBER_TO_PERCENT = 100;
+    private double principal = 0;
+    private double interestRate = 0;
+    private int howManyYears = 0;
 
     @FXML
     TextField textFieldPrincipal;
@@ -34,15 +37,17 @@ public class Controller {
     @FXML
     Button buttonNeueBerechnung;
 
-
-
-
     @FXML
     void buttonBerechnenClicked(ActionEvent event) {
-        inputTest();
-        resultMonthlyPayment();
-        resultPayment();
-        buttonBerechnen.setDisable(true);
+        if (validationPrincipal()) {
+            if (validationInterestRate()) {
+                if (validationHowManyYears()) {
+                    resultMonthlyPayment();
+                    resultPayment();
+                    buttonBerechnen.setDisable(true);
+                }
+            }
+        }
     }
 
     @FXML
@@ -55,57 +60,81 @@ public class Controller {
         textFieldTerm.setText("");
 
     }
-    double principal = 0;
-    double interestRate = 0;
-    int howManyYears = 0;
 
-    private void  inputTest(){
-
+    private boolean validationPrincipal() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Falsche eingabe");
         try {
             principal = Double.parseDouble(textFieldPrincipal.getText());
-        }
-        catch (NumberFormatException e){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Falsche eingabe");
+            if (principal >= 0)
+                return true;
+            else {
+                alert.setContentText("Bitte nehnen Sie Ihre Darlehensbetrag in positive Zahl");
+                alert.showAndWait();
+                textFieldPrincipal.setText("");
+                return false;
+            }
+        } catch (NumberFormatException e) {
             alert.setContentText("Bitte nehnen Sie Ihre Darlehensbetrag");
             alert.showAndWait();
             textFieldPrincipal.setText("");
-            return;
+            return false;
         }
+    }
+    private boolean validationInterestRate() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Falsche eingabe");
         try {
-            interestRate = Double.parseDouble(textFieldInterestRate.getText()) ;
+            interestRate = Double.parseDouble(textFieldInterestRate.getText());
+            if (interestRate >= 0 && interestRate <= 100 )
+                return true;
+            else {
+                alert.setContentText("Bitte nehnen Sie Ihre kredit Sollzins in zalh 0 bis 100");
+                alert.showAndWait();
+                textFieldInterestRate.setText("");
+                return false;
+            }
         }
-        catch (NumberFormatException e){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Falsche eingabe");
+        catch (NumberFormatException e) {
             alert.setContentText("Bitte nehnen Sie Ihre kredit Sollzins");
             alert.showAndWait();
             textFieldInterestRate.setText("");
-            return;
+            return false;
         }
+
+
+    }
+    private boolean validationHowManyYears(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Falsche eingabe");
         try {
             howManyYears = Integer.parseInt(textFieldTerm.getText()) ;
+            if (howManyYears >= 0)
+                return true;
+            else{
+                alert.setContentText("Bitte nehnen Sie Ihre kredit Laufzeit in positive Zahl");
+                alert.showAndWait();
+                textFieldTerm.setText("");
+                return false;
+            }
         }
         catch (NumberFormatException e){
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Falsche eingabe");
             alert.setContentText("Bitte nehnen Sie Ihre kredit Laufzeit in Jahre");
             alert.showAndWait();
             textFieldTerm.setText("");
-            return;
+            return false;
         }
     }
 
     private void resultPayment() {
         textFieldTotalPayment.setText(String.valueOf(NumberFormat.getCurrencyInstance().format
-                (totalPayback
-                        (monthlyPayment(principal , monthlyInterestRate(percentInterestRate(interestRate , NUMBER_TO_PERCENT) , MONTH_IN_THE_YEAR) ,
-                                numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)),numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)))));
+                (totalPayback(monthlyPayment(principal , monthlyInterestRate(percentInterestRate(interestRate , NUMBER_TO_PERCENT) , MONTH_IN_THE_YEAR) ,
+                numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)),numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)))));
     }
 
     private void resultMonthlyPayment(){
-        textFieldMonthlyPayment.setText(String.valueOf(NumberFormat.getCurrencyInstance().format(monthlyPayment(principal ,
-                monthlyInterestRate(percentInterestRate(interestRate , NUMBER_TO_PERCENT) , MONTH_IN_THE_YEAR) ,
+        textFieldMonthlyPayment.setText(String.valueOf(NumberFormat.getCurrencyInstance().format
+                (monthlyPayment(principal , monthlyInterestRate(percentInterestRate(interestRate , NUMBER_TO_PERCENT) , MONTH_IN_THE_YEAR) ,
                 numberOfPayments(howManyYears , MONTH_IN_THE_YEAR)))));
     }
 
@@ -139,8 +168,4 @@ public class Controller {
                 ((Math.pow(1 + monthlyInterestRate , numbersOfPayments)) -1);
         return monthlyPayment;
     }
-
-
-
-
 }
