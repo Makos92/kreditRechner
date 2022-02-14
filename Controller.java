@@ -10,11 +10,11 @@ import java.text.NumberFormat;
 
 
 public class Controller {
-    private static final int MONTH_IN_THE_YEAR = 12;
-    private static final int NUMBER_TO_PERCENT = 100;
-    private double principal = 0;
-    private double interestRate = 0;
-    private int howManyYears = 0;
+    public static final int MONTH_IN_THE_YEAR = 12;
+    public static final int NUMBER_TO_PERCENT = 100;
+    public double principal = 0;
+    public double interestRate = 0;
+    public int howManyYears = 0;
 
     @FXML
     TextField textFieldPrincipal;
@@ -62,65 +62,51 @@ public class Controller {
     }
 
     private boolean validationPrincipal() {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("Falsche eingabe");
         try {
             principal = Double.parseDouble(textFieldPrincipal.getText());
             if (principal >= 0)
                 return true;
             else {
-                alert.setContentText("Bitte nehnen Sie Ihre Darlehensbetrag in positive Zahl");
-                alert.showAndWait();
+                alert("Bitte nennen Sie Ihre Darlehensbeträge in positive Zahl");
                 textFieldPrincipal.setText("");
                 return false;
             }
         } catch (NumberFormatException e) {
-            alert.setContentText("Bitte nehnen Sie Ihre Darlehensbetrag");
-            alert.showAndWait();
+            alert("Bitte nennen Sie Ihre Darlehensbeträge");
             textFieldPrincipal.setText("");
             return false;
         }
     }
 
     private boolean validationInterestRate() {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("Falsche eingabe");
         try {
             interestRate = Double.parseDouble(textFieldInterestRate.getText());
             if (interestRate >= 0 && interestRate <= 100)
                 return true;
             else {
-                alert.setContentText("Bitte nehnen Sie Ihre kredit Sollzins in zalh 0 bis 100");
-                alert.showAndWait();
+                alert("Bitte nennen Sie Ihre Kredit Sollzins in zahl 0 bis 100");
                 textFieldInterestRate.setText("");
                 return false;
             }
         } catch (NumberFormatException e) {
-            alert.setContentText("Bitte nehnen Sie Ihre kredit Sollzins");
-            alert.showAndWait();
+            alert("Bitte nennen Sie Ihre Kredit Sollzins");
             textFieldInterestRate.setText("");
             return false;
         }
-
-
     }
 
     private boolean validationHowManyYears() {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText("Falsche eingabe");
         try {
             howManyYears = Integer.parseInt(textFieldTerm.getText());
             if (howManyYears >= 0)
                 return true;
             else {
-                alert.setContentText("Bitte nehnen Sie Ihre kredit Laufzeit in positive Zahl");
-                alert.showAndWait();
+                alert("Bitte nennen Sie Ihre Kreditlaufzeit in positive Zahl");
                 textFieldTerm.setText("");
                 return false;
             }
         } catch (NumberFormatException e) {
-            alert.setContentText("Bitte nehnen Sie Ihre kredit Laufzeit in Jahre");
-            alert.showAndWait();
+            alert("Bitte nennen Sie Ihre Kreditlaufzeit in Jahre");
             textFieldTerm.setText("");
             return false;
         }
@@ -138,36 +124,39 @@ public class Controller {
                         numberOfPayments(howManyYears, MONTH_IN_THE_YEAR)))));
     }
 
+    //Alert fenster
+    private void alert(String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Falsche Eingabe");
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
     //number to percent
-    private double percentInterestRate(double interestRate, int numberToPercent) {
-        double percentInterestRate = interestRate / numberToPercent;
-        return percentInterestRate;
+    public double percentInterestRate(double interestRate, int numberToPercent) {
+        return interestRate / numberToPercent;
 
     }
 
     //monats zins
-    private double monthlyInterestRate(double percentInterestRate, int monthInTheYear) {
-        double monthlyInterestRate = percentInterestRate / monthInTheYear;
-        return monthlyInterestRate;
+    public double monthlyInterestRate(double percentInterestRate, int monthInTheYear) {
+        return percentInterestRate / monthInTheYear;
     }
 
     // rate zahl
-    private int numberOfPayments(int howManyYear, int monthInTheYear) {
-        int numberOfPayments = howManyYear * monthInTheYear;
-        return numberOfPayments;
+    public int numberOfPayments(int howManyYear, int monthInTheYear) {
+        return howManyYear * monthInTheYear;
     }
 
     //gesamt kredit
-    private double totalPayback(double monthlyPayment, int numberOfPayments) {
-        double totalPayback = monthlyPayment * numberOfPayments;
-        return totalPayback;
+    public double totalPayback(double monthlyPayment, int numberOfPayments) {
+        return monthlyPayment * numberOfPayments;
     }
 
     //monats rate
-    private double monthlyPayment(double principal, double monthlyInterestRate, int numbersOfPayments) {
-        double monthlyPayment = principal *
+    public double monthlyPayment(double principal, double monthlyInterestRate, int numbersOfPayments) {
+        return principal *
                 (monthlyInterestRate * (Math.pow(1 + monthlyInterestRate, numbersOfPayments))) /
                 ((Math.pow(1 + monthlyInterestRate, numbersOfPayments)) - 1);
-        return monthlyPayment;
     }
 }
